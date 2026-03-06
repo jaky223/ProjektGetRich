@@ -1,0 +1,14 @@
+com/example/dto/UserLoginRequest.class
+com/example/strategy/LoginStrategy.class
+com/example/strategy/GoogleLoginStrategy.class
+com/example/strategy/ClassicRegistrationStrategy.class
+com/example/strategy/RegistrationStrategy.class
+com/example/databasexpo/UserRepository.class
+com/example/validation/UserAttributesValidator.class
+com/example/strategy/ClassicLoginStrategy.class
+com/example/databasexpo/FlywayConfig.class
+com/example/strategy/GoogleRegistrationStrategy.class
+com/example/dto/UserRegistrationRequest.class
+com/example/controller/UserController.class
+com/example/MyApplication.class
+com/example/databasexpo/User.class
