@@ -1,11 +1,39 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
   const [aiPrompt, setAiPrompt] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
+
+  // Stanja za osnovnu tražilicu
+  const [location, setLocation] = useState("");
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [guests, setGuests] = useState("1");
+
+  const handleRegularSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const query = new URLSearchParams();
+    if (location) query.append("location", location);
+
+    if (checkIn && checkOut) {
+      query.append("dates", `${checkIn} do ${checkOut}`);
+    } else if (checkIn) {
+      query.append("dates", `Od ${checkIn}`);
+    } else if (checkOut) {
+      query.append("dates", `Do ${checkOut}`);
+    }
+
+    if (guests) {
+      query.append("guests", `${guests} osoba`);
+    }
+
+    router.push(`/search?${query.toString()}`);
+  };
 
   const handleAiSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,35 +124,69 @@ export default function Home() {
           </p>
 
           {/* Oblačić za pretraživanje (Search Bar) */}
-          <div className="bg-white p-1.5 rounded-3xl md:rounded-full shadow-xl w-full max-w-4xl flex flex-col md:flex-row items-center divide-y md:divide-y-0 md:divide-x divide-gray-200 relative z-20">
+          <form onSubmit={handleRegularSearch} className="bg-white p-1.5 rounded-3xl md:rounded-full shadow-xl w-full max-w-5xl flex flex-col md:flex-row items-center divide-y md:divide-y-0 md:divide-x divide-gray-200 relative z-20">
             {/* Lokacija */}
-            <div className="flex-1 w-full px-8 py-2 cursor-pointer hover:bg-gray-50 rounded-t-3xl md:rounded-full transition group">
+            <div className="flex-[1.5] w-full px-6 py-2 cursor-pointer hover:bg-gray-50 rounded-t-3xl md:rounded-full transition group">
               <label className="block text-[10px] font-extrabold text-gray-800 uppercase tracking-wider mb-0.5 cursor-pointer group-hover:text-blue-600 transition">Gdje idete?</label>
-              <input type="text" placeholder="Npr. Zadar, Split, Istra..." className="w-full bg-transparent border-none text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-0 text-sm truncate font-medium" />
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Npr. Zadar, Split, Istra..."
+                className="w-full bg-transparent border-none text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-0 text-sm truncate font-medium p-0"
+              />
             </div>
 
-            {/* Datumi */}
-            <div className="flex-1 w-full px-8 py-2 cursor-pointer hover:bg-gray-50 md:rounded-full transition group">
-              <label className="block text-[10px] font-extrabold text-gray-800 uppercase tracking-wider mb-0.5 cursor-pointer group-hover:text-blue-600 transition">Kada?</label>
-              <input type="text" placeholder="Dodajte datume" className="w-full bg-transparent border-none text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-0 text-sm font-medium" />
+            {/* Prijava */}
+            <div className="flex-1 w-full px-6 py-2 cursor-pointer hover:bg-gray-50 transition group">
+              <label className="block text-[10px] font-extrabold text-gray-800 uppercase tracking-wider mb-0.5 cursor-pointer group-hover:text-blue-600 transition">Prijava</label>
+              <input
+                type="date"
+                value={checkIn}
+                onChange={(e) => setCheckIn(e.target.value)}
+                className="w-full bg-transparent border-none text-gray-900 focus:outline-none focus:ring-0 text-sm font-medium p-0 cursor-text"
+              />
+            </div>
+
+            {/* Odjava */}
+            <div className="flex-1 w-full px-6 py-2 cursor-pointer hover:bg-gray-50 transition group">
+              <label className="block text-[10px] font-extrabold text-gray-800 uppercase tracking-wider mb-0.5 cursor-pointer group-hover:text-blue-600 transition">Odjava</label>
+              <input
+                type="date"
+                value={checkOut}
+                min={checkIn}
+                onChange={(e) => setCheckOut(e.target.value)}
+                className="w-full bg-transparent border-none text-gray-900 focus:outline-none focus:ring-0 text-sm font-medium p-0 cursor-text"
+              />
             </div>
 
             {/* Gosti */}
-            <div className="flex-1 w-full px-6 py-2 cursor-pointer hover:bg-gray-50 rounded-b-3xl md:rounded-full transition flex flex-col md:flex-row justify-between md:items-center group">
-              <div className="px-2 mb-2 md:mb-0">
-                <label className="block text-[10px] font-extrabold text-gray-800 uppercase tracking-wider mb-0.5 cursor-pointer group-hover:text-blue-600 transition">Tko ide?</label>
-                <input type="text" placeholder="Dodajte goste" className="w-full bg-transparent border-none text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-0 text-sm font-medium" />
+            <div className="flex-[1.2] w-full px-4 py-2 cursor-pointer hover:bg-gray-50 rounded-b-3xl md:rounded-full transition flex flex-col md:flex-row justify-between md:items-center group">
+              <div className="px-2 mb-2 md:mb-0 w-full md:w-auto">
+                <label className="block text-[10px] font-extrabold text-gray-800 uppercase tracking-wider mb-0.5 cursor-pointer group-hover:text-blue-600 transition">Gosti</label>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={guests}
+                    onChange={(e) => setGuests(e.target.value)}
+                    placeholder="1"
+                    className="w-12 bg-transparent border-none text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-0 text-sm font-medium p-0 text-center"
+                  />
+                  <span className="text-sm font-medium text-gray-600">osoba</span>
+                </div>
               </div>
 
               {/* Veliki gumb za pretragu */}
-              <button className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl md:rounded-full transition shadow-lg flex items-center justify-center min-w-[44px] min-h-[44px] md:ml-2 transform hover:scale-105 w-full md:w-auto">
+              <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl md:rounded-full transition shadow-lg flex items-center justify-center min-w-[44px] min-h-[44px] md:ml-2 transform hover:scale-105 w-full md:w-auto mt-2 md:mt-0">
                 <svg className="w-5 h-5 hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <span className="md:hidden font-bold">Pretraži</span>
               </button>
             </div>
-          </div>
+          </form>
 
           {/* AI Pretraživanje - Novo */}
           <div className="flex items-center gap-4 my-6 w-full max-w-lg z-20">
@@ -405,3 +467,4 @@ export default function Home() {
     </div>
   );
 }
+
