@@ -2,12 +2,19 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import AuthModal from "../components/AuthModal";
 
 export default function Home() {
   const router = useRouter();
   const [aiPrompt, setAiPrompt] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isChatExpanded, setIsChatExpanded] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
+
+  // Auth stanja
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalView, setAuthModalView] = useState<"login" | "register">("login");
+  const [loggedInUser, setLoggedInUser] = useState<string | null>(null);
 
   // Stanja za osnovnu tražilicu
   const [location, setLocation] = useState("");
@@ -63,20 +70,40 @@ export default function Home() {
 
         {/* MENI - Sredina (Centrirano) */}
         <div className="hidden md:flex justify-center gap-10 font-semibold tracking-wide drop-shadow-md text-sm lg:text-base">
-          <a href="#" className="hover:text-blue-300 transition hover:-translate-y-0.5 duration-300">Smještaj</a>
-          <a href="#" className="hover:text-blue-300 transition hover:-translate-y-0.5 duration-300">Letovi</a>
-          <a href="#" className="hover:text-blue-300 transition hover:-translate-y-0.5 duration-300">Iskustva</a>
-          <a href="#" className="hover:text-blue-300 transition hover:-translate-y-0.5 duration-300">Rent-a-car</a>
+          {/* Prostor za buduće linkove */}
         </div>
 
         {/* GUMBI - Desno */}
         <div className="flex justify-end gap-5 items-center">
-          <button className="font-semibold hover:text-blue-300 transition drop-shadow-md hidden sm:block">Prijavi se</button>
-          <button className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white px-6 py-2.5 rounded-full font-bold transition shadow-xl border border-white/20 transform hover:scale-105">
-            Registracija
-          </button>
+          {loggedInUser ? (
+            <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-lg">
+              <span className="font-semibold text-white tracking-wide text-sm">Pozdrav, {loggedInUser}</span>
+              <button onClick={() => setLoggedInUser(null)} className="text-blue-200 hover:text-white transition font-medium text-xs bg-black/20 px-3 py-1.5 rounded-full hover:bg-black/40">Odjava</button>
+            </div>
+          ) : (
+            <>
+              <button
+                onClick={() => router.push('/dodaj-smjestaj')}
+                className="font-bold text-white hover:text-blue-200 transition drop-shadow-md hidden md:block bg-white/20 px-4 py-2 rounded-full border border-white/30 backdrop-blur-sm hover:bg-white/30"
+              >
+                Objavi svoj smještaj
+              </button>
+              <button onClick={() => { setAuthModalView("login"); setIsAuthModalOpen(true); }} className="font-semibold hover:text-blue-300 transition drop-shadow-md hidden sm:block">Prijavi se</button>
+              <button onClick={() => { setAuthModalView("register"); setIsAuthModalOpen(true); }} className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white px-6 py-2.5 rounded-full font-bold transition shadow-xl border border-white/20 transform hover:scale-105">
+                Registracija
+              </button>
+            </>
+          )}
         </div>
       </nav>
+
+      {/* Auth Modal Komponenta */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onLoginSuccess={(username) => setLoggedInUser(username)}
+        initialView={authModalView}
+      />
 
       {/* Hero Sekcija */}
       <div className="relative min-h-[85vh] w-full flex items-center justify-center pt-24 pb-16">
@@ -328,11 +355,11 @@ export default function Home() {
       </div>
 
       {/* FLOATING AI CHAT WIDGET */}
-      <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end">
+      <div className={`fixed z-[100] flex flex-col items-end transition-all duration-300 ${isChatExpanded ? 'inset-0 items-center justify-center bg-black/40 backdrop-blur-sm p-4' : 'bottom-6 right-6 pointer-events-none'}`}>
 
         {/* Chat Prozor */}
         {isChatOpen && (
-          <div className="mb-4 w-full sm:w-[380px] h-[550px] max-h-[80vh] bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/40 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-10 duration-300">
+          <div className={`${isChatExpanded ? 'w-full max-w-6xl h-[90vh]' : 'mb-4 w-full sm:w-[420px] h-[600px] max-h-[80vh]'} pointer-events-auto bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/40 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-10 duration-300`}>
 
             {/* Header chat prozora */}
             <div className="bg-gradient-to-r from-violet-600/80 to-fuchsia-600/80 backdrop-blur-md p-4 flex justify-between items-center text-white shadow-md relative z-10 border-b border-white/20">
@@ -347,14 +374,30 @@ export default function Home() {
                   <p className="text-[10px] text-fuchsia-100 font-medium tracking-wider uppercase">Uvijek tu za vas</p>
                 </div>
               </div>
-              <button
-                onClick={() => setIsChatOpen(false)}
-                className="hover:bg-white/20 p-2 rounded-full transition flex items-center justify-center pointer"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setIsChatExpanded(!isChatExpanded)}
+                  className="hover:bg-white/20 p-2 rounded-full transition flex items-center justify-center"
+                  title={isChatExpanded ? "Smanji prozor" : "Proširi preko cijelog ekrana"}
+                >
+                  {isChatExpanded ? (
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v4H5M9 7L4 2M15 3v4h4M15 7l5-5M9 21v-4H5M9 17l-5 5M15 21v-4h4M15 17l5 5" /></svg>
+                  ) : (
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4h4M4 4l5 5M16 4h4v4M20 4l-5 5M4 16v4h4M4 20l5-5M16 20h4v-4M20 20l-5-5" /></svg>
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    setIsChatOpen(false);
+                    setIsChatExpanded(false);
+                  }}
+                  className="hover:bg-white/20 p-2 rounded-full transition flex items-center justify-center pointer"
+                >
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
             </div>
 
             {/* Sadržaj Poruka */}
@@ -385,45 +428,97 @@ export default function Home() {
 
               {/* Odgovor s karticama */}
               {!isAiLoading && aiPrompt && (
-                <div className="self-start flex items-start gap-2 w-full">
+                <div className="self-start flex items-start gap-2 w-full max-w-[100%]">
                   <div className="bg-gradient-to-br from-violet-500 to-fuchsia-500 w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-md mt-1">
                     <span className="text-white text-[10px] font-bold">AI</span>
                   </div>
-                  <div className="flex flex-col gap-2 w-full pr-2">
-                    <div className="bg-white/60 backdrop-blur-md border border-white/50 text-gray-800 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
+                  <div className="flex flex-col gap-3 w-full overflow-hidden">
+                    <div className="bg-white/80 backdrop-blur-md border border-white/60 text-gray-800 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm inline-block w-fit">
                       <p className="font-medium text-sm leading-relaxed">
-                        Savršen izbor! ✨ Pronašao sam opcije u Dalmaciji prilagođene obitelji koje su jako blizu pješčanih plaža:
+                        Savršen izbor! ✨ Pronašao sam 3 najbolje opcije u Dalmaciji blizu pješčanih plaža s obiteljskim sadržajima:
                       </p>
                     </div>
 
-                    {/* Preporuka kartica 1 u chatu */}
-                    <div className="bg-white/50 backdrop-blur-md p-2 rounded-xl shadow-sm border border-white/50 hover:border-violet-300 hover:bg-white/70 hover:shadow-md transition cursor-pointer group">
-                      <div className="aspect-[16/9] w-full rounded-lg overflow-hidden relative mb-2">
-                        <img src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcSbvZV0-UgDwVobO5y057pQumcyP9t-J7Wn69MJgYMpGIsvMRpKb1OWRAdTCkjk2Phs6qQ3HwYQhbHhDeKNy4Lqjxw&s=19" alt="Smještaj" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                        <div className="absolute bottom-1 left-1 bg-white/90 px-1.5 py-0.5 rounded text-[10px] font-bold text-violet-700 shadow-sm">
-                          98%
-                        </div>
-                      </div>
-                      <h4 className="font-bold text-gray-900 text-sm line-clamp-1">Family Resort Duće</h4>
-                      <div className="flex justify-between items-center mt-1">
-                        <span className="font-bold text-blue-600 text-xs">145€/noć</span>
-                        <button className="text-[10px] bg-blue-50 text-blue-700 font-bold px-2 py-1 rounded-md">Pogledaj</button>
-                      </div>
-                    </div>
+                    {/* Horizontalni Carousel za smještaje - vidljiv scrollbar */}
+                    <div className="flex gap-4 overflow-x-auto pb-4 pt-2 px-1 w-full snap-x snap-mandatory [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-white/10 [&::-webkit-scrollbar-thumb]:bg-white/50 [&::-webkit-scrollbar-thumb]:rounded-full">
 
-                    {/* Preporuka kartica 2 u chatu */}
-                    <div className="bg-white/50 backdrop-blur-md p-2 rounded-xl shadow-sm border border-white/50 hover:border-violet-300 hover:bg-white/70 hover:shadow-md transition cursor-pointer group">
-                      <div className="aspect-[16/9] w-full rounded-lg overflow-hidden relative mb-2">
-                        <img src="https://lh3.googleusercontent.com/gps-cs-s/AHVAwep80cDORxceOru7jDNBroOErPIU42SWm5I-hxzBF5uXmeUASdMDxyALrY9KTkZtt9MxujzCTf6nEbqqqbHCgz7Y8eKhb015SPuRblugeqcgfQfQopbwJOH0occDQYqqfH5FI2xz=w675-h390-n-k-no" alt="Smještaj" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                        <div className="absolute bottom-1 left-1 bg-white/90 px-1.5 py-0.5 rounded text-[10px] font-bold text-violet-700 shadow-sm">
-                          95%
+                      {/* Kartica 1 */}
+                      <div className="snap-center shrink-0 w-[240px] md:w-[260px] bg-white/90 backdrop-blur-lg p-3 rounded-2xl shadow-lg border border-white/60 hover:shadow-xl hover:-translate-y-1 transition duration-300 group flex flex-col justify-between">
+                        <div>
+                          <div className="aspect-[4/3] w-full rounded-xl overflow-hidden relative mb-3">
+                            <img src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcSbvZV0-UgDwVobO5y057pQumcyP9t-J7Wn69MJgYMpGIsvMRpKb1OWRAdTCkjk2Phs6qQ3HwYQhbHhDeKNy4Lqjxw&s=19" alt="Smještaj" className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                            <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg flex gap-1 items-center">
+                              <span className="text-yellow-400 text-xs">★</span>
+                              <span className="text-white text-[10px] font-bold">4.9</span>
+                            </div>
+                            <div className="absolute bottom-2 right-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white px-2 py-1 rounded text-[10px] font-extrabold shadow-md">
+                              Najbolji odabir AI-a
+                            </div>
+                          </div>
+                          <h4 className="font-extrabold text-gray-900 text-base line-clamp-1 mb-1">Family Resort Duće</h4>
+                          <p className="text-gray-500 text-xs line-clamp-2 font-medium mb-3">Savršeno za obitelji s djecom, samo 50m od mora i privatne pješčane plaže.</p>
+                        </div>
+                        <div>
+                          <div className="flex justify-between items-end mb-3">
+                            <span className="text-gray-400 text-xs line-through">190€</span>
+                            <span className="font-extrabold text-gray-900 text-lg">145€<span className="text-xs text-gray-500 font-medium">/noć</span></span>
+                          </div>
+                          <button onClick={() => router.push('/smjestaj/1')} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs transition shadow-md active:scale-95 duration-200">
+                            Rezerviraj odmah
+                          </button>
                         </div>
                       </div>
-                      <h4 className="font-bold text-gray-900 text-sm line-clamp-1">Vila pješčana uvala</h4>
-                      <div className="flex justify-between items-center mt-1">
-                        <span className="font-bold text-blue-600 text-xs">160€/noć</span>
-                        <button className="text-[10px] bg-blue-50 text-blue-700 font-bold px-2 py-1 rounded-md">Pogledaj</button>
+
+                      {/* Kartica 2 */}
+                      <div className="snap-center shrink-0 w-[240px] md:w-[260px] bg-white/90 backdrop-blur-lg p-3 rounded-2xl shadow-lg border border-white/60 hover:shadow-xl hover:-translate-y-1 transition duration-300 group flex flex-col justify-between">
+                        <div>
+                          <div className="aspect-[4/3] w-full rounded-xl overflow-hidden relative mb-3">
+                            <img src="https://lh3.googleusercontent.com/gps-cs-s/AHVAwep80cDORxceOru7jDNBroOErPIU42SWm5I-hxzBF5uXmeUASdMDxyALrY9KTkZtt9MxujzCTf6nEbqqqbHCgz7Y8eKhb015SPuRblugeqcgfQfQopbwJOH0occDQYqqfH5FI2xz=w675-h390-n-k-no" alt="Smještaj" className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                            <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg flex gap-1 items-center">
+                              <span className="text-yellow-400 text-xs">★</span>
+                              <span className="text-white text-[10px] font-bold">4.7</span>
+                            </div>
+                          </div>
+                          <h4 className="font-extrabold text-gray-900 text-base line-clamp-1 mb-1">Vila Pješčana Uvala</h4>
+                          <p className="text-gray-500 text-xs line-clamp-2 font-medium mb-3">Moderno uređena vila s plitkim dječjim bazenom i velikim dvorištem.</p>
+                        </div>
+                        <div>
+                          <div className="flex justify-between items-end mb-3">
+                            <span className="text-xs text-green-600 font-bold bg-green-100 px-2 py-0.5 rounded-full">-10% popusta</span>
+                            <span className="font-extrabold text-gray-900 text-lg">160€<span className="text-xs text-gray-500 font-medium">/noć</span></span>
+                          </div>
+                          <button onClick={() => router.push('/smjestaj/2')} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs transition shadow-md active:scale-95 duration-200">
+                            Rezerviraj odmah
+                          </button>
+                        </div>
                       </div>
+
+                      {/* Kartica 3 */}
+                      <div className="snap-center shrink-0 w-[240px] md:w-[260px] bg-white/90 backdrop-blur-lg p-3 rounded-2xl shadow-lg border border-white/60 hover:shadow-xl hover:-translate-y-1 transition duration-300 group flex flex-col justify-between">
+                        <div>
+                          <div className="aspect-[4/3] w-full rounded-xl overflow-hidden relative mb-3">
+                            <img src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcSgmfyY9H5y_sXNwuz4Nel_LAV9G94lGov8NLiIUm_uN-jf1xh0ogjpfizta10fQ4xcl6IQzMTNdTk44jk-Oo87Ae8&s=19" alt="Smještaj" className="w-full h-full object-cover group-hover:scale-110 transition duration-500 filter grayscale-[20%]" />
+                            <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg flex gap-1 items-center">
+                              <span className="text-yellow-400 text-xs">★</span>
+                              <span className="text-white text-[10px] font-bold">4.8</span>
+                            </div>
+                            <div className="absolute inset-x-0 bottom-0 bg-red-600 text-white py-1 text-center text-[10px] font-bold">
+                              Još samo 1 slobodna noć!
+                            </div>
+                          </div>
+                          <h4 className="font-extrabold text-gray-900 text-base line-clamp-1 mb-1">Apartman Omiška Rivijera</h4>
+                          <p className="text-gray-500 text-xs line-clamp-2 font-medium mb-3">Pristupačna opcija prvi red do mora. Prikladno za rane dječje aktivnosti.</p>
+                        </div>
+                        <div>
+                          <div className="flex justify-end items-end mb-3">
+                            <span className="font-extrabold text-gray-900 text-lg">115€<span className="text-xs text-gray-500 font-medium">/noć</span></span>
+                          </div>
+                          <button onClick={() => router.push('/smjestaj/3')} className="w-full bg-white border-2 border-blue-600 text-blue-700 hover:bg-blue-50 font-bold py-1.5 rounded-xl text-xs transition shadow-sm active:scale-95 duration-200">
+                            Pogledaj detalje
+                          </button>
+                        </div>
+                      </div>
+
                     </div>
                   </div>
                 </div>
@@ -451,7 +546,7 @@ export default function Home() {
         {!isChatOpen && (
           <button
             onClick={() => setIsChatOpen(true)}
-            className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white p-4 rounded-full shadow-2xl flex items-center justify-center transform hover:scale-110 transition-all duration-300 group"
+            className="pointer-events-auto bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white p-4 rounded-full shadow-2xl flex items-center justify-center transform hover:scale-110 transition-all duration-300 group"
           >
             <svg className="w-8 h-8 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />

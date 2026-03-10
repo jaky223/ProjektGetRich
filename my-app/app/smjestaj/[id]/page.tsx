@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Reviews from "@/components/Reviews";
 
 export default function StranicaDetaljaSmjestaja() {
     const params = useParams();
@@ -235,6 +236,9 @@ export default function StranicaDetaljaSmjestaja() {
                             ))}
                         </div>
                     </div>
+
+                    {/* Recenzije */}
+                    <Reviews smjestajId={smjestaj.id} rating={smjestaj.rating} totalReviews={smjestaj.reviews} />
                 </div>
 
                 {/* Desna kolona (Sticky Booking Box) */}
