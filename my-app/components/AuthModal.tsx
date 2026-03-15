@@ -41,10 +41,27 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView
         const baseUrl = "http://localhost:8080/api/users";
         const endpoint = isLoginView ? "/login/classic" : "/register/classic";
 
+        // Formatting HTML date input (YYYY-MM-DD) to expected backend format (DD-MM-YYYY)
+        let formattedDob = dateOfBirth;
+        if (dateOfBirth) {
+            try {
+                // dateOfBirth from <input type="date"> is typically "YYYY-MM-DD"
+                const dateObj = new Date(dateOfBirth);
+                if (!isNaN(dateObj.getTime())) {
+                    const day = String(dateObj.getDate()).padStart(2, '0');
+                    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    const year = dateObj.getFullYear();
+                    formattedDob = `${day}-${month}-${year}`;
+                }
+            } catch (e) {
+                // fallback to original if parsing fails
+            }
+        }
+
         // Construct request body based on the DTO map
         const payload = isLoginView
             ? { username, password, email }
-            : { username, password, email, firstName, lastName, dateOfBirth, phoneNumber };
+            : { username, password, email, firstName, lastName, dateOfBirth: formattedDob, phoneNumber };
 
         try {
             const response = await fetch(`${baseUrl}${endpoint}`, {
@@ -62,11 +79,17 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView
                 throw new Error(errorData);
             }
 
-            const data = await response.json();
+            let data;
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                data = await response.json();
+            } else {
+                data = await response.text();
+            }
 
             // Simulating a successful login and saving username to callback
             // Depending on the actual backend implementation, it might return token or user details map
-            const actualUsername = username || data.login || "Korisnik";
+            const actualUsername = username || data?.login || (typeof data === 'string' ? username : "Korisnik");
             onLoginSuccess(actualUsername);
             onClose(); // Hide modal on success
 
@@ -172,7 +195,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView
                             <>
                                 <input
                                     type="date"
-                                    placeholder="Datum rođenja"
+                                    placeholder="Datum rođenja (DD-MM-YYYY)"
                                     title="Datum rođenja"
                                     value={dateOfBirth}
                                     onChange={(e) => setDateOfBirth(e.target.value)}

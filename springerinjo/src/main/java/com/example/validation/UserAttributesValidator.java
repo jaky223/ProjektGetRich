@@ -11,7 +11,7 @@ public class UserAttributesValidator {
     // Ime i prezime - samo slova i razmaci (uključujući naša slova), min 2 znaka
     private static final String NAME_REGEX = "^[a-zA-ZčćžšđČĆŽŠĐ\\s-]{2,}$";
     // Datum rođenja - format DD-MM-YYYY
-    private static final String DOB_REGEX = "^\\d{2}-\\d{2}-\\d{4}$";
+    private static final String DOB_REGEX = "^\\d{1,2}[.-]\\d{1,2}[.-]\\d{4}$";
     // Broj telefona - može početi s +, i sadržavati brojeve, razmake i crtice, 9 do
     // 15 znakova
     private static final String PHONE_REGEX = "^\\+?[0-9\\s-]{9,15}$";

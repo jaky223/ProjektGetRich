@@ -1,16 +1,29 @@
 package com.example.strategy;
 
+import com.example.databasexpo.User;
 import com.example.dto.UserRegistrationRequest;
 import com.example.validation.UserAttributesValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.databasexpo.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+
 @Service
 public class ClassicRegistrationStrategy implements RegistrationStrategy {
+
+    private final UserRepository userRepository;
+
+    @Autowired
+    public ClassicRegistrationStrategy(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public boolean supports(String type) {
@@ -19,6 +32,8 @@ public class ClassicRegistrationStrategy implements RegistrationStrategy {
 
     @Override
     public ResponseEntity<?> register(UserRegistrationRequest request) {
+        System.out.println(
+                "DEBUG REGISTER: Received Request = " + request.getUsername() + ", dob = " + request.getDateOfBirth());
         List<String> errors = new ArrayList<>();
 
         if (!UserAttributesValidator.isValidUsername(request.getUsername())) {
@@ -48,6 +63,19 @@ public class ClassicRegistrationStrategy implements RegistrationStrategy {
         if (!errors.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
+
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        user.setDateOfBirth(LocalDate.parse(request.getDateOfBirth(), formatter));
+        user.setPhoneNumber(request.getPhoneNumber());
+
+        userRepository.save(user);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Korisnik uspješno registriran (classic)!");
     }

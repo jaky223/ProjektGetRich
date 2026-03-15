@@ -1,0 +1,55 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-03-15T21:14:28.749+01:00  INFO 18273 --- [           main] com.example.MyApplication                : Starting MyApplication v0.0.1-SNAPSHOT using Java 25.0.2 with PID 18273 (/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/target/myproject-0.0.1-SNAPSHOT.jar started by sbicak in /Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo)
+2026-03-15T21:14:28.751+01:00  INFO 18273 --- [           main] com.example.MyApplication                : No active profile set, falling back to 1 default profile: "default"
+2026-03-15T21:14:29.037+01:00  INFO 18273 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-03-15T21:14:29.059+01:00  INFO 18273 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 18 ms. Found 1 JPA repository interface.
+2026-03-15T21:14:29.243+01:00  INFO 18273 --- [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-03-15T21:14:29.248+01:00  INFO 18273 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-03-15T21:14:29.248+01:00  INFO 18273 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-03-15T21:14:29.256+01:00  INFO 18273 --- [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 484 ms
+2026-03-15T21:14:29.319+01:00  INFO 18273 --- [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-03-15T21:14:29.339+01:00  INFO 18273 --- [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.4.Final
+2026-03-15T21:14:29.507+01:00  INFO 18273 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-03-15T21:14:29.520+01:00  INFO 18273 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-03-15T21:14:29.572+01:00  INFO 18273 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@62ab5e63
+2026-03-15T21:14:29.572+01:00  INFO 18273 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-03-15T21:14:29.584+01:00  WARN 18273 --- [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-03-15T21:14:29.594+01:00  INFO 18273 --- [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/getrich_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.3
+	Default catalog/schema: getrich_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-03-15T21:14:29.914+01:00  INFO 18273 --- [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-03-15T21:14:29.918+01:00  INFO 18273 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-03-15T21:14:29.999+01:00  INFO 18273 --- [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:5432/getrich_db (PostgreSQL 18.3)
+2026-03-15T21:14:30.022+01:00  INFO 18273 --- [           main] o.f.core.internal.command.DbValidate     : Successfully validated 1 migration (execution time 00:00.009s)
+2026-03-15T21:14:30.029+01:00  INFO 18273 --- [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 1
+2026-03-15T21:14:30.030+01:00  INFO 18273 --- [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-03-15T21:14:30.042+01:00  WARN 18273 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-03-15T21:14:30.142+01:00  INFO 18273 --- [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-03-15T21:14:30.380+01:00  INFO 18273 --- [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
+2026-03-15T21:14:30.383+01:00  INFO 18273 --- [           main] com.example.MyApplication                : Started MyApplication in 1.772 seconds (process running for 1.998)
+2026-03-15T21:15:26.067+01:00  INFO 18273 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-03-15T21:15:26.067+01:00  INFO 18273 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-03-15T21:15:26.068+01:00  INFO 18273 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+DEBUG REGISTER: Received Request = sbicak20, dob = 11-03-2026
+DEBUG REGISTER: Received Request = sbicak20, dob = 11-03-2026
+DEBUG REGISTER: Received Request = testuser2, dob = 01-01-2000
+DEBUG REGISTER: Received Request = testuser2, dob = 01-01-2000
+DEBUG REGISTER: Received Request = sbicak20, dob = 11-03-2026

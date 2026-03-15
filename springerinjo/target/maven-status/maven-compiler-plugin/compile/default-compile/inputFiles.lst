@@ -1,1 +1,15 @@
 /Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/MyApplication.java
+/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/controller/UserController.java
+/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/databasexpo/FlywayConfig.java
+/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/databasexpo/User.java
+/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/databasexpo/UserRepository.java
+/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/dto/UserLoginRequest.java
+/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/dto/UserRegistrationRequest.java
+/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/strategy/ClassicLoginStrategy.java
+/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/strategy/ClassicRegistrationStrategy.java
+/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/strategy/GoogleLoginStrategy.java
+/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/strategy/GoogleRegistrationStrategy.java
+/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/strategy/LoginStrategy.java
+/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/strategy/RegistrationStrategy.java
+/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/validation/TestValidator.java
+/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/validation/UserAttributesValidator.java
