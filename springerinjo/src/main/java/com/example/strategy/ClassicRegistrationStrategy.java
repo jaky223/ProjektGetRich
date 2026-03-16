@@ -13,14 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.databasexpo.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 public class ClassicRegistrationStrategy implements RegistrationStrategy {
 
     private final UserRepository userRepository;
 
-    @Autowired
     public ClassicRegistrationStrategy(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
