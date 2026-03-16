@@ -89,7 +89,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView
 
             // Simulating a successful login and saving username to callback
             // Depending on the actual backend implementation, it might return token or user details map
-            const actualUsername = username || data?.login || (typeof data === 'string' ? username : "Korisnik");
+            const actualUsername = data?.firstName || username || (typeof data === 'string' ? username : "Korisnik");
             onLoginSuccess(actualUsername);
             onClose(); // Hide modal on success
 
