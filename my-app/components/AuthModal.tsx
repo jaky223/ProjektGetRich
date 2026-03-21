@@ -37,9 +37,8 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView
     const handleGoogleSuccess = async (credential: string) => {
         setIsLoading(true);
         setError(null);
-
-        const baseUrl = "http://localhost:8080/api/users";
-        const endpoint = isLoginView ? "/login/google" : "/register/google";
+        const baseUrl = "http://localhost:8080/api/google/auth";
+        const endpoint = isLoginView ? "/login" : "/register";
 
         try {
             const response = await fetch(`${baseUrl}${endpoint}`, {
@@ -47,6 +46,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ token: credential }),
             });
+            
 
             if (!response.ok) {
                 let errorData = "Došlo je do greške prilikom Google prijave.";

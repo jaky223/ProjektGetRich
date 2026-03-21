@@ -5,6 +5,7 @@ com/example/validation/TestValidator.class
 com/example/strategy/ClassicRegistrationStrategy.class
 com/example/strategy/RegistrationStrategy.class
 com/example/databasexpo/UserRepository.class
+com/example/controller/GoogleController.class
 com/example/validation/UserAttributesValidator.class
 com/example/strategy/ClassicLoginStrategy.class
 com/example/databasexpo/FlywayConfig.class
