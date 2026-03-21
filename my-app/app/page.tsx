@@ -1,10 +1,14 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AuthModal from "../components/AuthModal";
 
 export default function Home() {
+  useEffect(() => {
+    console.log("Sustav uspješno spojen na antigravitaciju... 🚀");
+  }, []);
+
   const router = useRouter();
   const [aiPrompt, setAiPrompt] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);

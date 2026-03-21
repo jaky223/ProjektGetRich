@@ -49,6 +49,28 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView
             
 
             if (!response.ok) {
+                // If user doesn't exist (404), transfer to registration form
+                if (response.status === 404) {
+                    const data = await response.json();
+                    
+                    // Switch to registration view
+                    setIsLoginView(false);
+                    
+                    // Pre-fill the registration fields
+                    if (data.email) setEmail(data.email);
+                    if (data.firstName) setFirstName(data.firstName);
+                    if (data.lastName) setLastName(data.lastName);
+                    
+                    // Set a default username from email
+                    if (data.email) {
+                        const emailParts = data.email.split('@')[0];
+                        setUsername(emailParts);
+                    }
+                    
+                    setError("Vaš Google račun nije registriran. Molimo dovršite registraciju.");
+                    return;
+                }
+
                 let errorData = "Došlo je do greške prilikom Google prijave.";
                 try {
                     const body = await response.text();
