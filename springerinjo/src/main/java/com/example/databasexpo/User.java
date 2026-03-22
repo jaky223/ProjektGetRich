@@ -100,4 +100,16 @@ public class User {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private java.util.List<Accommodation> accommodations = new java.util.ArrayList<>();
+
+    public java.util.List<Accommodation> getAccommodations() {
+        return accommodations;
+    }
+
+    public void setAccommodations(java.util.List<Accommodation> accommodations) {
+        this.accommodations = accommodations;
+    }
 }

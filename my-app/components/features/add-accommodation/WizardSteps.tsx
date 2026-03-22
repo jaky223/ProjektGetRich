@@ -177,9 +177,9 @@ export function Step5Images({ formData, handleImageUpload, removeImage }: any) {
                     <div className="mt-6">
                         <h4 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wider">Odabrane fotografije ({formData.slike.length})</h4>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {formData.slike.map((src: any, index: number) => (
+                            {formData.slike.map((img: any, index: number) => (
                                 <div key={index} className="relative aspect-[4/3] rounded-xl overflow-hidden group border border-gray-200 shadow-sm">
-                                    <img src={src} alt="Upload preview" className="w-full h-full object-cover" />
+                                    <img src={img.previewUrl} alt="Upload preview" className="w-full h-full object-cover" />
                                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                         <button type="button" onClick={() => removeImage(index)} className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 shadow-lg transform hover:scale-110 transition">
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>

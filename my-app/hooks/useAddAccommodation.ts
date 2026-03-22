@@ -1,16 +1,19 @@
 import { useState } from "react";
 
+export interface AccommodationImage {
+    file: File;
+    previewUrl: string;
+}
+
 export function useAddAccommodation() {
     const [step, setStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [formData, setFormData] = useState({
-        // Korak 1
         ime: "",
         prezime: "",
         email: "",
         telefon: "",
-        // Korak 2
         nazivSmjestaja: "",
         tipSmjestaja: "Apartman",
         brojGostiju: "2",
@@ -18,17 +21,14 @@ export function useAddAccommodation() {
         brojKreveta: "1",
         brojKupaonica: "1",
         cijenaPoNoci: "",
-        // Korak 3
         drzava: "Hrvatska",
         grad: "",
         postanskiBroj: "",
         ulica: "",
-        // Korak 4
         opis: "",
         sadrzaji: [] as string[],
         kucniLjubimci: false,
-        // Korak 5
-        slike: [] as string[],
+        slike: [] as AccommodationImage[],
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -54,7 +54,10 @@ export function useAddAccommodation() {
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
-            const newImages = Array.from(e.target.files).map(file => URL.createObjectURL(file));
+            const newImages = Array.from(e.target.files).map(file => ({
+                file,
+                previewUrl: URL.createObjectURL(file)
+            }));
             setFormData(prev => ({
                 ...prev,
                 slike: [...prev.slike, ...newImages]
@@ -63,10 +66,14 @@ export function useAddAccommodation() {
     };
 
     const removeImage = (indexToRemove: number) => {
-        setFormData(prev => ({
-            ...prev,
-            slike: prev.slike.filter((_, index) => index !== indexToRemove)
-        }));
+        setFormData(prev => {
+            const imgToRemove = prev.slike[indexToRemove];
+            if (imgToRemove) URL.revokeObjectURL(imgToRemove.previewUrl);
+            return {
+                ...prev,
+                slike: prev.slike.filter((_, index) => index !== indexToRemove)
+            };
+        });
     };
 
     const nextStep = () => {
@@ -79,14 +86,60 @@ export function useAddAccommodation() {
         setStep(s => s - 1);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent, username: string) => {
         e.preventDefault();
         setIsSubmitting(true);
-        setTimeout(() => {
-            setIsSubmitting(false);
+        
+        try {
+            const data = new FormData();
+            
+            // Bundle all metadata into a single JSON object
+            const metadata = {
+                username,
+                title: formData.nazivSmjestaja,
+                type: formData.tipSmjestaja,
+                guests: formData.brojGostiju,
+                bedrooms: formData.brojSpavacihSoba,
+                beds: formData.brojKreveta,
+                bathrooms: formData.brojKupaonica,
+                pricePerNight: formData.cijenaPoNoci,
+                country: formData.drzava,
+                city: formData.grad,
+                postalCode: formData.postanskiBroj,
+                street: formData.ulica,
+                description: formData.opis,
+                petsAllowed: formData.kucniLjubimci,
+                amenities: formData.sadrzaji
+            };
+
+            // Add the JSON part with explicitly set Content-Type
+            const jsonBlob = new Blob([JSON.stringify(metadata)], { type: 'application/json' });
+            data.append("data", jsonBlob);
+            
+            // Add images as separate parts (but now many fewer parts in total!)
+            formData.slike.forEach(img => {
+                data.append("images", img.file);
+            });
+
+            const res = await fetch("http://localhost:8080/api/accommodations", {
+                method: "POST",
+                body: data
+            });
+
+            console.log(res);
+
+            if (!res.ok) {
+                throw new Error("Greška prilikom objave smještaja");
+            }
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            setStep(6); 
-        }, 2000);
+            setStep(5);
+        } catch (error) {
+            console.error(error);
+            alert("Došlo je do pogreške prilikom objave. Molimo pokušajte ponovno.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return {
