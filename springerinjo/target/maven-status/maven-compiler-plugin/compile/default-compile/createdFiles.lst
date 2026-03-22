@@ -1,6 +1,7 @@
 com/example/dto/UserLoginRequest.class
 com/example/strategy/LoginStrategy.class
 com/example/strategy/GoogleLoginStrategy.class
+com/example/exception/GlobalExceptionHandler.class
 com/example/validation/TestValidator.class
 com/example/strategy/ClassicRegistrationStrategy.class
 com/example/strategy/RegistrationStrategy.class

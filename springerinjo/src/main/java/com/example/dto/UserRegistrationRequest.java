@@ -8,8 +8,17 @@ public class UserRegistrationRequest {
     private String lastName;
     private String dateOfBirth;
     private String phoneNumber;
+    private String token;
 
     public UserRegistrationRequest() {
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getUsername() {

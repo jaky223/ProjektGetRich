@@ -6,6 +6,7 @@
 /Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/databasexpo/UserRepository.java
 /Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/dto/UserLoginRequest.java
 /Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/dto/UserRegistrationRequest.java
+/Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/exception/GlobalExceptionHandler.java
 /Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/strategy/ClassicLoginStrategy.java
 /Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/strategy/ClassicRegistrationStrategy.java
 /Users/sbicak/Documents/getrich/ProjektGetRich/springerinjo/src/main/java/com/example/strategy/GoogleLoginStrategy.java

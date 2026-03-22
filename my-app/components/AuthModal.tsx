@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import GoogleAuthButton from "./GoogleAuthButton";
+import { useAuthForm } from "../hooks/useAuthForm";
 
 interface AuthModalProps {
     isOpen: boolean;
@@ -11,167 +11,9 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView = "login" }: AuthModalProps) {
-    const [isLoginView, setIsLoginView] = useState(initialView === "login");
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (isOpen) {
-            setIsLoginView(initialView === "login");
-            setError(null);
-        }
-    }, [isOpen, initialView]);
-
-    // Form states
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [email, setEmail] = useState("");
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [dateOfBirth, setDateOfBirth] = useState("");
-    const [phoneNumber, setPhoneNumber] = useState("");
-    const [isHost, setIsHost] = useState(false);
+    const { isLoginView, isLoading, error, form, actions, setError } = useAuthForm(initialView, onLoginSuccess, onClose, isOpen);
 
     if (!isOpen) return null;
-
-    const handleGoogleSuccess = async (credential: string) => {
-        setIsLoading(true);
-        setError(null);
-        const baseUrl = "http://localhost:8080/api/google/auth";
-        const endpoint = isLoginView ? "/login" : "/register";
-
-        try {
-            const response = await fetch(`${baseUrl}${endpoint}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token: credential }),
-            });
-            
-
-            if (!response.ok) {
-                // If user doesn't exist (404), transfer to registration form
-                if (response.status === 404) {
-                    const data = await response.json();
-                    
-                    // Switch to registration view
-                    setIsLoginView(false);
-                    
-                    // Pre-fill the registration fields
-                    if (data.email) setEmail(data.email);
-                    if (data.firstName) setFirstName(data.firstName);
-                    if (data.lastName) setLastName(data.lastName);
-                    
-                    // Set a default username from email
-                    if (data.email) {
-                        const emailParts = data.email.split('@')[0];
-                        setUsername(emailParts);
-                    }
-                    
-                    setError("Vaš Google račun nije registriran. Molimo dovršite registraciju.");
-                    return;
-                }
-
-                let errorData = "Došlo je do greške prilikom Google prijave.";
-                try {
-                    const body = await response.text();
-                    if (body) errorData = body;
-                } catch { }
-                throw new Error(errorData);
-            }
-
-            let data;
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.includes("application/json")) {
-                data = await response.json();
-            } else {
-                data = await response.text(); // Because backend mock returns just a map stringified maybe? Text is safer fallback.
-            }
-
-            // Get a logical username or fallback
-            // In a real app, backend decodes Google JWT, registers/logs in user, returns info
-            const userName = data?.firstName || data?.username || "Google Korisnik";
-            
-            onLoginSuccess(userName);
-            onClose();
-
-        } catch (err: any) {
-            setError(err.message || "Pogreška u komunikaciji sa serverom (Google).");
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setError(null);
-
-        const baseUrl = "http://localhost:8080/api/users";
-        const endpoint = isLoginView ? "/login/classic" : "/register/classic";
-
-        // Formatting HTML date input (YYYY-MM-DD) to expected backend format (DD-MM-YYYY)
-        let formattedDob = dateOfBirth;
-        if (dateOfBirth) {
-            try {
-                // dateOfBirth from <input type="date"> is typically "YYYY-MM-DD"
-                const dateObj = new Date(dateOfBirth);
-                if (!isNaN(dateObj.getTime())) {
-                    const day = String(dateObj.getDate()).padStart(2, '0');
-                    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                    const year = dateObj.getFullYear();
-                    formattedDob = `${day}-${month}-${year}`;
-                }
-            } catch (e) {
-                // fallback to original if parsing fails
-            }
-        }
-
-        // Construct request body based on the DTO map
-        const payload = isLoginView
-            ? { username, password, email }
-            : { username, password, email, firstName, lastName, dateOfBirth: formattedDob, phoneNumber };
-
-        try {
-            const response = await fetch(`${baseUrl}${endpoint}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
-
-            if (!response.ok) {
-                let errorData = "Došlo je do greške prilikom prijave/registracije.";
-                try {
-                    const body = await response.text();
-                    if (body) errorData = body;
-                } catch { }
-                throw new Error(errorData);
-            }
-
-            let data;
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.includes("application/json")) {
-                data = await response.json();
-            } else {
-                data = await response.text();
-            }
-
-            // Simulating a successful login and saving username to callback
-            // Depending on the actual backend implementation, it might return token or user details map
-            const actualUsername = data?.firstName || username || (typeof data === 'string' ? username : "Korisnik");
-            onLoginSuccess(actualUsername);
-            onClose(); // Hide modal on success
-
-        } catch (err: any) {
-            setError(err.message || "Pogreška u komunikaciji sa serverom.");
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const toggleView = () => {
-        setIsLoginView(!isLoginView);
-        setError(null);
-    };
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 sm:p-6 animate-in fade-in duration-200">
@@ -199,11 +41,11 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView
 
                 {/* Form Content */}
                 <div className="p-6 sm:p-8 overflow-y-auto">
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                    <form onSubmit={actions.handleSubmit} className="flex flex-col gap-4">
 
                         {/* Error message */}
                         {error && (
-                            <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm font-medium border border-red-100 text-center animate-pulse">
+                            <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm font-medium border border-red-100 text-center animate-pulse whitespace-pre-wrap">
                                 {error}
                             </div>
                         )}
@@ -215,16 +57,16 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView
                                     type="text"
                                     placeholder="Ime"
                                     required
-                                    value={firstName}
-                                    onChange={(e) => setFirstName(e.target.value)}
+                                    value={form.firstName}
+                                    onChange={(e) => form.setFirstName(e.target.value)}
                                     className="w-1/2 p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition text-gray-800 shadow-sm"
                                 />
                                 <input
                                     type="text"
                                     placeholder="Prezime"
                                     required
-                                    value={lastName}
-                                    onChange={(e) => setLastName(e.target.value)}
+                                    value={form.lastName}
+                                    onChange={(e) => form.setLastName(e.target.value)}
                                     className="w-1/2 p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition text-gray-800 shadow-sm"
                                 />
                             </div>
@@ -234,8 +76,8 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView
                             type="text"
                             placeholder="Korisničko ime"
                             required
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            value={form.username}
+                            onChange={(e) => form.setUsername(e.target.value)}
                             className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition text-gray-800 shadow-sm"
                         />
 
@@ -244,8 +86,8 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView
                                 type="email"
                                 placeholder="Email adresa"
                                 required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                value={form.email}
+                                onChange={(e) => form.setEmail(e.target.value)}
                                 className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition text-gray-800 shadow-sm"
                             />
                         )}
@@ -254,8 +96,8 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView
                             type="password"
                             placeholder="Lozinka"
                             required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            value={form.password}
+                            onChange={(e) => form.setPassword(e.target.value)}
                             className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition text-gray-800 shadow-sm"
                         />
 
@@ -265,15 +107,15 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView
                                     type="date"
                                     placeholder="Datum rođenja (DD-MM-YYYY)"
                                     title="Datum rođenja"
-                                    value={dateOfBirth}
-                                    onChange={(e) => setDateOfBirth(e.target.value)}
+                                    value={form.dateOfBirth}
+                                    onChange={(e) => form.setDateOfBirth(e.target.value)}
                                     className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition text-gray-800 shadow-sm text-sm"
                                 />
                                 <input
                                     type="tel"
                                     placeholder="Broj mobitela"
-                                    value={phoneNumber}
-                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                    value={form.phoneNumber}
+                                    onChange={(e) => form.setPhoneNumber(e.target.value)}
                                     className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition text-gray-800 shadow-sm"
                                 />
                             </>
@@ -307,7 +149,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView
                     {/* Google Login Component */}
                     <div className="w-full flex justify-center">
                         <GoogleAuthButton 
-                            onSuccess={handleGoogleSuccess}
+                            onSuccess={actions.handleGoogleSuccess}
                             onError={() => setError("Google prijava/registracija nije uspjela.")}
                         />
                     </div>
@@ -317,7 +159,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, initialView
                         {isLoginView ? "Nemate račun?" : "Već imate račun?"}{" "}
                         <button
                             type="button"
-                            onClick={toggleView}
+                            onClick={actions.toggleView}
                             className="text-blue-600 font-bold hover:underline"
                         >
                             {isLoginView ? "Registrirajte se" : "Prijavite se"}
